@@ -2,6 +2,7 @@
 
 bool validateHexadecimalString(std::string);
 bool validateBinaryString(std::string);
+unsigned short getPlainTextScore(std::string);
 
 std::string cpt::hexXor(std::string hexA, std::string hexB) {
     if (hexA.size() != hexB.size()) {
@@ -25,6 +26,57 @@ std::string cpt::hexXor(std::string hexA, std::string hexB) {
         }
     }
     return binary2hex(binaryXor);
+}
+
+std::string cpt::hexXorSingleByte(std::string hex, std::string xorByte) {
+    if (!validateHexadecimalString(hex)) {
+        throw std::string("Invalid hexadecimal data provided");
+    }
+    if (!validateHexadecimalString(xorByte) || !(xorByte.size() <= 2)) {
+        throw std::string("Invalid byte key provided");
+    }
+    
+    //Force byte alignment for hexadecimal data
+    if (hex.size() % 2 != 0) {
+        hex = "0" + hex;
+    }
+
+    //Force byte alignment for xorByte
+    if (xorByte.size() == 0) {
+        xorByte = "00";
+    } else if (xorByte.size() == 1) {
+        xorByte = "0" + xorByte;
+    }
+
+    std::string repeatedXorByte;
+    for (unsigned index = 0; index < hex.size(); index += 2) {
+        repeatedXorByte += xorByte;
+    }
+
+    return hexXor(hex, repeatedXorByte);
+}
+
+std::string cpt::decodeSingleByteCipher(std::string hex) {
+    if (!validateHexadecimalString(hex)) {
+        throw std::string("Invalid hexadecimal data provided");
+    }
+
+    unsigned short scores[256];
+    for (unsigned i = 0; i < 256; ++i) {
+        std::string hexByte = binary2hex(decimal2binary(i));
+        std::string decodedCipher = hexXorSingleByte(hex, hexByte);
+        scores[i] = getPlainTextScore(decodedCipher);
+    }
+    unsigned highestScore = 0;
+    unsigned highestScoreIndex = 0;
+    for (unsigned i = 0; i < 256; ++i) {
+        if (scores[i] > highestScore) {
+            highestScore = scores[i];
+            highestScoreIndex = i;
+        }
+    }
+    std::string hexByte = binary2hex(decimal2binary(highestScoreIndex));
+    return hexXorSingleByte(hex, hexByte);
 }
 
 std::string cpt::hex2base64(std::string hex) {
@@ -60,6 +112,36 @@ std::string cpt::hex2binary(std::string hex) {
         }
     }
     return binary;
+}
+
+std::string cpt::decimal2binary(unsigned value) {
+    std::string binary;
+
+    do {
+        if (value & 1) {
+            binary = '1' + binary;
+        } else {
+            binary = '0' + binary;
+        }
+        value = value >> 1;
+    } while (value > 0);
+
+    return binary;
+}
+
+unsigned cpt::binary2decimal(std::string binary) {
+    if (!validateBinaryString(binary)) {
+        throw std::string("Invalid binary data provided");
+    }
+
+    unsigned value = 0;
+    for (char bit : binary) {
+        value = value << 1;
+        if (bit == '1') {
+            ++value;
+        }
+    }
+    return value;
 }
 
 std::string cpt::binary2hex(std::string binary) {
@@ -145,4 +227,31 @@ bool validateBinaryString(std::string binary) {
         }
     }
     return true;
+}
+
+unsigned short getPlainTextScore(std::string hex) {
+    if (!validateHexadecimalString(hex)) {
+        throw std::string("Invalid hexadecimal data provided");
+    }
+
+    //Force byte alignment for hexadecimal data
+    if (hex.size() % 2 != 0) {
+        hex = "0" + hex;
+    }
+
+    unsigned short score = 0;
+    for (unsigned index = 0; index < hex.size(); index += 2) {
+        std::string binary = cpt::hex2binary(hex.substr(index, 2));
+        char character = static_cast<char>(cpt::binary2decimal(binary));
+        if (character >= 'a' && character <= 'z') {
+            score += 500;
+        } else if (character == ' ') {
+            score += 150;
+        } else if (character >= 'A' && character <= 'Z') {
+            score += 100;
+        } else if (character >= '0' && character <= '9') {
+            score += 50;
+        }
+    }
+    return score;
 }
