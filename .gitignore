@@ -28,4 +28,5 @@
 *.app
 
 crypto/*.sdf
+crypto/*.opensdf
 crypto/crypto/Debug/*
