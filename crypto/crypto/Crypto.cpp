@@ -229,7 +229,7 @@ bool validateBinaryString(std::string binary) {
     return true;
 }
 
-unsigned short getPlainTextScore(std::string hex) {
+unsigned short cpt::getPlainTextScore(std::string hex) {
     if (!validateHexadecimalString(hex)) {
         throw std::string("Invalid hexadecimal data provided");
     }

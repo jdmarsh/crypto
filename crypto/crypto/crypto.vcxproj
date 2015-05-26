@@ -71,6 +71,9 @@
     <ClInclude Include="Crypto.h" />
     <ClInclude Include="Main.h" />
   </ItemGroup>
+  <ItemGroup>
+    <Text Include="4.txt" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

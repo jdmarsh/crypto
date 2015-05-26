@@ -14,6 +14,8 @@ namespace cpt {
     unsigned binary2decimal(std::string);
     std::string binary2hex(std::string);
     std::string binary2base64(std::string);
+
+    unsigned short getPlainTextScore(std::string);
 }
 
 #endif
