@@ -3,6 +3,30 @@
 bool validateHexadecimalString(std::string);
 bool validateBinaryString(std::string);
 
+std::string cpt::hexXor(std::string hexA, std::string hexB) {
+    if (hexA.size() != hexB.size()) {
+        throw std::string("hexadecimal values must be of equal length");
+    }
+    if (!validateHexadecimalString(hexA) || !validateHexadecimalString(hexB)) {
+        throw std::string("Invalid hexadecimal data provided");
+    }
+
+    std::string binaryA = hex2binary(hexA);
+    std::string binaryB = hex2binary(hexB);
+    
+    std::string binaryXor;
+    for (unsigned index = 0; index < binaryA.size(); ++index) {
+        bool bitA = binaryA[index] == '1';
+        bool bitB = binaryB[index] == '1';
+        if (bitA ^ bitB) {
+            binaryXor += '1';
+        } else {
+            binaryXor += '0';
+        }
+    }
+    return binary2hex(binaryXor);
+}
+
 std::string cpt::hex2base64(std::string hex) {
     if (!validateHexadecimalString(hex)) {
         throw std::string("Invalid hexadecimal data provided");
@@ -18,6 +42,7 @@ std::string cpt::hex2binary(std::string hex) {
 
     std::string binary;
     for (char character : hex) {
+        //Convert from ASCII to decimal
         unsigned decimalValue;
         if (character >= '0' && character <= '9') {
             decimalValue = static_cast<unsigned>(character)-48;
@@ -35,6 +60,37 @@ std::string cpt::hex2binary(std::string hex) {
         }
     }
     return binary;
+}
+
+std::string cpt::binary2hex(std::string binary) {
+    if (!validateBinaryString(binary)) {
+        throw std::string("Invalid binary data provided");
+    }
+
+    //Prepend the string with zeros until we reach a 4 bit alignment
+    for (unsigned index = 0; index < binary.size() % 4; ++index) {
+        binary = "0" + binary;
+    }
+
+    std::string hex;
+    unsigned character;
+    for (unsigned bitChunkIndex = 0; bitChunkIndex < binary.size(); bitChunkIndex += 4) {
+        character = 0;
+        for (unsigned bitIndex = 0; bitIndex < 4; ++bitIndex) {
+            character = character << 1;
+            if (binary[bitChunkIndex + bitIndex] == '1') {
+                ++character;
+            }
+        }
+        //Convert from decimal to ASCII
+        if (character < 10) {
+            character += 48;
+        } else {
+            character += 87;
+        }
+        hex += static_cast<char>(character);
+    }
+    return hex;
 }
 
 std::string cpt::binary2base64(std::string binary) {
@@ -55,6 +111,7 @@ std::string cpt::binary2base64(std::string binary) {
             }
         }
 
+        //Convert from ASCII to base64 representation
         if (character < 26) {
             character += 65;
         } else if (character < 52) {
