@@ -79,6 +79,22 @@ std::string cpt::decodeSingleByteCipher(std::string hex) {
     return hexXorSingleByte(hex, hexByte);
 }
 
+std::string cpt::repeatingKeyXor(std::string message, std::string key) {
+    for (unsigned i = 0; i < message.size(); ++i) {
+        message[i] ^= key[i%key.size()];
+    }
+    return ascii2hex(message);
+}
+
+std::string cpt::ascii2hex(std::string message) {
+    std::string hex;
+    for (unsigned i = 0; i < message.size(); ++i) {
+        hex += decimal2hex(message[i] >> 4);
+        hex += decimal2hex(message[i] & 0xf);
+    }
+    return hex;
+}
+
 std::string cpt::hex2base64(std::string hex) {
     if (!validateHexadecimalString(hex)) {
         throw std::string("Invalid hexadecimal data provided");
@@ -112,6 +128,21 @@ std::string cpt::hex2binary(std::string hex) {
         }
     }
     return binary;
+}
+
+std::string cpt::decimal2hex(unsigned value) {
+    std::string hex;
+    do {
+        unsigned character = value & 0xf;
+        if (character < 10) {
+            character += 48;
+        } else {
+            character += 87;
+        }
+        hex += static_cast<char>(character);
+        value = value >> 4;
+    } while (value > 0);
+    return hex;
 }
 
 std::string cpt::decimal2binary(unsigned value) {

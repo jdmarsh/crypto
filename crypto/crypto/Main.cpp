@@ -62,6 +62,12 @@ int main() {
     } catch (std::string e) {
         std::cout << e;
     }
+    try {
+        std::cout << std::endl << "Set 1 Challenge 5" << std::endl;
+        std::cout << cpt::repeatingKeyXor("Burning 'em, if you ain't quick and nimble I go crazy when I hear a cymbal", "ICE");
+    } catch (std::string e) {
+        std::cout << e;
+    }
 
     return 0;
 }
