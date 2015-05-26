@@ -4,7 +4,7 @@ bool validateHexadecimalString(std::string);
 bool validateBinaryString(std::string);
 unsigned short getPlainTextScore(std::string);
 
-std::string cpt::hexXor(std::string hexA, std::string hexB) {
+std::string cpt::hexXor(std::string& hexA, std::string& hexB) {
     if (hexA.size() != hexB.size()) {
         throw std::string("hexadecimal values must be of equal length");
     }
@@ -56,7 +56,7 @@ std::string cpt::hexXorSingleByte(std::string hex, std::string xorByte) {
     return hexXor(hex, repeatedXorByte);
 }
 
-std::string cpt::decodeSingleByteCipher(std::string hex) {
+std::string cpt::decodeSingleByteCipher(std::string& hex) {
     if (!validateHexadecimalString(hex)) {
         throw std::string("Invalid hexadecimal data provided");
     }
@@ -79,23 +79,26 @@ std::string cpt::decodeSingleByteCipher(std::string hex) {
     return hexXorSingleByte(hex, hexByte);
 }
 
-std::string cpt::repeatingKeyXor(std::string message, std::string key) {
+std::string cpt::repeatingKeyXor(std::string& message, std::string& key) {
+    std::string encodedMessage;
     for (unsigned i = 0; i < message.size(); ++i) {
-        message[i] ^= key[i%key.size()];
+        encodedMessage += message[i] ^ key[i % key.size()];
     }
-    return ascii2hex(message);
+    return ascii2hex(encodedMessage);
 }
 
-std::string cpt::ascii2hex(std::string message) {
+std::string cpt::ascii2hex(std::string& message) {
     std::string hex;
     for (unsigned i = 0; i < message.size(); ++i) {
-        hex += decimal2hex(message[i] >> 4);
-        hex += decimal2hex(message[i] & 0xf);
+        unsigned lByte = message[i] >> 4;
+        unsigned rByte = message[i] & 0xf;
+        hex += decimal2hex(lByte);
+        hex += decimal2hex(rByte);
     }
     return hex;
 }
 
-std::string cpt::hex2base64(std::string hex) {
+std::string cpt::hex2base64(std::string& hex) {
     if (!validateHexadecimalString(hex)) {
         throw std::string("Invalid hexadecimal data provided");
     }
@@ -103,7 +106,7 @@ std::string cpt::hex2base64(std::string hex) {
     return binary2base64(binary);
 }
 
-std::string cpt::hex2binary(std::string hex) {
+std::string cpt::hex2binary(std::string& hex) {
     if (!validateHexadecimalString(hex)) {
         throw std::string("Invalid hexadecimal data provided");
     }
@@ -160,7 +163,7 @@ std::string cpt::decimal2binary(unsigned value) {
     return binary;
 }
 
-unsigned cpt::binary2decimal(std::string binary) {
+unsigned cpt::binary2decimal(std::string& binary) {
     if (!validateBinaryString(binary)) {
         throw std::string("Invalid binary data provided");
     }
@@ -206,7 +209,7 @@ std::string cpt::binary2hex(std::string binary) {
     return hex;
 }
 
-std::string cpt::binary2base64(std::string binary) {
+std::string cpt::binary2base64(std::string& binary) {
     if (!validateBinaryString(binary)) {
         throw std::string("Invalid binary data provided");
     }

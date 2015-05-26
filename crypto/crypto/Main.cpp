@@ -19,7 +19,8 @@ int main() {
 
     try {
         std::cout << "Set 1 Challenge 3" << std::endl;
-        std::string hexMessage = cpt::decodeSingleByteCipher("1b37373331363f78151b7f2b783431333d78397828372d363c78373e783a393b3736");
+        std::string encodedMessage = "1b37373331363f78151b7f2b783431333d78397828372d363c78373e783a393b3736";
+        std::string hexMessage = cpt::decodeSingleByteCipher(encodedMessage);
         std::string binaryMessage = cpt::hex2binary(hexMessage);
         for (unsigned i = 0; i < binaryMessage.size(); i += 8) {
             std::cout << static_cast<char>(cpt::binary2decimal(binaryMessage.substr(i, 8)));
@@ -64,7 +65,9 @@ int main() {
     }
     try {
         std::cout << std::endl << "Set 1 Challenge 5" << std::endl;
-        std::cout << cpt::repeatingKeyXor("Burning 'em, if you ain't quick and nimble I go crazy when I hear a cymbal", "ICE");
+        std::string message = "Burning 'em, if you ain't quick and nimble I go crazy when I hear a cymbal";
+        std::string key = "ICE";
+        std::cout << cpt::repeatingKeyXor(message, key);
     } catch (std::string e) {
         std::cout << e;
     }
