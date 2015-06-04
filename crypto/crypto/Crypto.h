@@ -5,7 +5,7 @@
 
 namespace cpt {
     std::string hexXor(std::string&, std::string&);
-    std::string hexXorSingleByte(std::string, std::string);
+    std::string hexXorSingleByte(std::string&, std::string&);
     std::string decodeSingleByteCipher(std::string&);
 
     std::string repeatingKeyXor(std::string&, std::string&);
@@ -16,7 +16,7 @@ namespace cpt {
     std::string decimal2hex(unsigned);
     std::string decimal2binary(unsigned);
     unsigned binary2decimal(std::string&);
-    std::string binary2hex(std::string);
+    std::string binary2hex(std::string&);
     std::string binary2base64(std::string&);
 
     unsigned short getPlainTextScore(std::string);

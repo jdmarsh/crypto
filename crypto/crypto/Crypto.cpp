@@ -14,6 +14,10 @@ std::string cpt::hexXor(std::string& hexA, std::string& hexB) {
 
     std::string binaryA = hex2binary(hexA);
     std::string binaryB = hex2binary(hexB);
+
+    if (binaryA.size() % 8 > 0) {
+        binaryA = "0000" + binaryA;
+    }
     
     std::string binaryXor;
     for (unsigned index = 0; index < binaryA.size(); ++index) {
@@ -27,29 +31,22 @@ std::string cpt::hexXor(std::string& hexA, std::string& hexB) {
     }
     return binary2hex(binaryXor);
 }
-
-std::string cpt::hexXorSingleByte(std::string hex, std::string xorByte) {
+#include <iostream>
+std::string cpt::hexXorSingleByte(std::string& hex, std::string& xorByte) {
     if (!validateHexadecimalString(hex)) {
         throw std::string("Invalid hexadecimal data provided");
     }
     if (!validateHexadecimalString(xorByte) || !(xorByte.size() <= 2)) {
         throw std::string("Invalid byte key provided");
     }
-    
-    //Force byte alignment for hexadecimal data
-    if (hex.size() % 2 != 0) {
-        hex = "0" + hex;
-    }
-
-    //Force byte alignment for xorByte
-    if (xorByte.size() == 0) {
-        xorByte = "00";
-    } else if (xorByte.size() == 1) {
-        xorByte = "0" + xorByte;
-    }
 
     std::string repeatedXorByte;
     for (unsigned index = 0; index < hex.size(); index += 2) {
+        if (xorByte.size() == 0) {
+            repeatedXorByte += "00";
+        } else if (xorByte.size() == 1) {
+            repeatedXorByte += "0";
+        }
         repeatedXorByte += xorByte;
     }
 
@@ -178,23 +175,18 @@ unsigned cpt::binary2decimal(std::string& binary) {
     return value;
 }
 
-std::string cpt::binary2hex(std::string binary) {
+std::string cpt::binary2hex(std::string& binary) {
     if (!validateBinaryString(binary)) {
         throw std::string("Invalid binary data provided");
     }
 
-    //Prepend the string with zeros until we reach a 4 bit alignment
-    for (unsigned index = 0; index < binary.size() % 4; ++index) {
-        binary = "0" + binary;
-    }
-
     std::string hex;
-    unsigned character;
-    for (unsigned bitChunkIndex = 0; bitChunkIndex < binary.size(); bitChunkIndex += 4) {
-        character = 0;
+    unsigned padding = (4 - (binary.size() % 4)) % 4;
+    for (unsigned bitChunkIndex = 0; bitChunkIndex < binary.size() + padding; bitChunkIndex += 4) {
+        unsigned character = 0;
         for (unsigned bitIndex = 0; bitIndex < 4; ++bitIndex) {
             character = character << 1;
-            if (binary[bitChunkIndex + bitIndex] == '1') {
+            if (bitChunkIndex + bitIndex >= padding && binary[bitChunkIndex + bitIndex - padding] == '1') {
                 ++character;
             }
         }
