@@ -7,5 +7,9 @@
 #include <string>
 #include <fstream>
 #include <deque>
+#include <thread>
+#include <mutex>
+
+#define NUM_THREADS 10
 
 #endif
