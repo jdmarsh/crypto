@@ -34,15 +34,41 @@ int main() {
         std::cout << std::endl << "Set 1 Challenge 4" << std::endl;
         std::ifstream file("4.txt", std::ifstream::in);
 
-        std::string hexBlock;
+        std::deque<std::string> hexBlocks;
         std::deque<std::string> decodedHexBlocks;
         std::deque<unsigned short> scores;
         unsigned index = 0;
         while (file.good()) {
-            std::getline(file, hexBlock);
-            decodedHexBlocks.push_back(cpt::decodeSingleByteCipher(hexBlock));
-            scores.push_back(cpt::getPlainTextScore(decodedHexBlocks[index]));
+            if (index + 1 > decodedHexBlocks.size()) {
+                hexBlocks.resize(index + 1);
+                decodedHexBlocks.resize(index + 1);
+                scores.resize(index + 1);
+            }
+
+            std::getline(file, hexBlocks[index]);
             ++index;
+        }
+
+        std::thread threads[NUM_THREADS];
+        std::mutex dataAccess;
+        for (unsigned lineIndex = 0; lineIndex < hexBlocks.size(); ++lineIndex) {
+            if (threads[lineIndex % NUM_THREADS].joinable()) {
+                threads[lineIndex % NUM_THREADS].join();
+            }
+            threads[lineIndex % NUM_THREADS] = std::thread([&, lineIndex](){
+                std::string decoded = cpt::decodeSingleByteCipher(hexBlocks[lineIndex]);
+                unsigned short score = cpt::getPlainTextScore(decoded);
+
+                std::lock_guard<std::mutex> lock(dataAccess);
+                decodedHexBlocks[lineIndex] = decoded;
+                scores[lineIndex] = score;
+            });
+        }
+
+        for (unsigned i = 0; i < NUM_THREADS; ++i) {
+            if (threads[i].joinable()) {
+                threads[i].join();
+            }
         }
 
         unsigned highestScore = 0;
